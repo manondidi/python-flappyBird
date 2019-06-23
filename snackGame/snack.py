@@ -36,8 +36,8 @@ def make_food():
 
 
 def make_food_position():
-    x = random.randint(0, COL)
-    y = random.randint(0, ROW)
+    x = random.randint(1, COL-1)
+    y = random.randint(1, ROW-1)
     food_position_local = [x, y]
     if not check_same_position(food_position_local, head_position) and not list(
             filter(lambda position: check_same_position(food_position_local, position), body_position_arr)):
@@ -133,7 +133,7 @@ def main():
         for body in body_position_arr:
             draw_rect(SNACK_BODY_COLOR, body[0], body[1])
         pygame.display.flip()
-        clock.tick(10)
+        clock.tick(6)
 
 
 if __name__ == "__main__":
