@@ -17,9 +17,12 @@ OFFSET_X = SCREEN_WIDTH
 OFFSET_Y = 80
 window_size = pygame.Rect(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)
 
+point = 0
+last_pipe = None
+
 
 def main():
-    global CLOCK, SCREEN, bird, floor
+    global CLOCK, SCREEN, bird, floor, point, last_pipe
     pygame.init()  # 初始化pygame
     CLOCK = pygame.time.Clock()
     SCREEN = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])  # 初始化一个用于显示的窗口
@@ -49,7 +52,6 @@ def main():
         if not bird.begin_fly:
             SCREEN.blit(message, (message_rect.x, message_rect.y))
         else:
-
             for i in range(COUNT):
                 center_y = make_center_y()
                 pipe_top = pipes_top[i]
@@ -68,24 +70,46 @@ def main():
                 (SCREEN_WIDTH - game_over.get_rect().width) / 2, (SCREEN_HEIGHT - game_over.get_rect().height) / 2))
         if check_conlision():
             bird.die = True
+        if not bird.die and bird.begin_fly:
+            arr = list(filter(lambda pipe:
+                              bird.rect.x > (pipe.rect.x + pipe.rect.width) > 0,
+                              pipes_botom))
+            if arr:
+                if last_pipe != arr[0]:
+                    point += 1
+                    last_pipe = arr[0]
+        if bird.begin_fly:
+            showPoint()
         pygame.display.flip()
         CLOCK.tick(FPS)
 
 
+def showPoint():
+    point_str = str(point)
+    num_image_list = []
+    for num in point_str:
+        num_image_list.append(ResourceLoader.get_image(ResourceLoader.NUMBER_IMAGES[int(num)]))
+    numbers_width = len(point_str) * ResourceLoader.get_image(ResourceLoader.NUMBER_IMAGES[0]).get_rect().width
+    first_num_x = (SCREEN_WIDTH - numbers_width) / 2
+
+    for i in range(len(num_image_list)):
+        SCREEN.blit(num_image_list[i], (first_num_x + i * numbers_width / len(point_str), 50))
+
+
 def reset():
-    global sprite_group, pipes_top, pipes_botom
+    global sprite_group, pipes_top, pipes_botom, point
     bird.reset()
     pipes_top = []
     pipes_botom = []
     Pipe.top_index = 0
     Pipe.bottom_index = 0
+    point = 0
 
     for i in range(COUNT):
         center_y = make_center_y()
         pipes_top.append(Pipe(OFFSET_X, OFFSET_Y, window_size, True, HORIZONTAL_DISTANCE, VERTICAL_DISTANCE, center_y))
         pipes_botom.append(
             Pipe(OFFSET_X, OFFSET_Y, window_size, False, HORIZONTAL_DISTANCE, VERTICAL_DISTANCE, center_y))
-
     sprite_group = []
     sprite_group.append(floor)
     sprite_group.extend(pipes_top)

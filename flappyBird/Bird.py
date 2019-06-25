@@ -48,7 +48,7 @@ class Bird(sprite.Sprite):
 
     def get_bird_image(self):
         self.count += 1
-        if self.count % 5 == 0:
+        if self.count % 5 == 0 and not self.die:
             self.image = self.get_next_status()
         return self.get_bird_rotate()
 
