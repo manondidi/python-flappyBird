@@ -10,7 +10,7 @@ class Bird(sprite.Sprite):
     MAX_UP_ANGLE = 20
     MAX_DOWN_ANGLE = -30
 
-    def __init__(self, window_size):
+    def __init__(self, window_size, wing_sound, die_sound):
         super().__init__()
         self.images = ResourceLoader.get_images(
             ["bluebird-midflap.png", "bluebird-upflap.png", "bluebird-downflap.png"])
@@ -19,20 +19,28 @@ class Bird(sprite.Sprite):
         self.currentY = self.rect.y
         self.status = 0
         self.window_size = window_size
-        self.die = False
+        self.isDie = False
         self.begin_fly = False
+        self.wing_sound = wing_sound
+        self.die_sound = die_sound
         self.reset()
+
+    def die(self):
+        self.isDie = True
+        self.begin_fly = False
+        self.die_sound.play()
 
     def reset(self):
         self.rect.x = 40
         self.rect.y = 290
-        self.die = False
+        self.isDie = False
         self.begin_fly = False
 
     def fly(self):
         self.begin_fly = True
         self.flying = True
         self.currentY = self.rect.y
+        self.wing_sound.play()
 
     def update(self):
         if self.begin_fly:
@@ -48,7 +56,7 @@ class Bird(sprite.Sprite):
 
     def get_bird_image(self):
         self.count += 1
-        if self.count % 5 == 0 and not self.die:
+        if self.count % 5 == 0 and not self.isDie:
             self.image = self.get_next_status()
         return self.get_bird_rotate()
 

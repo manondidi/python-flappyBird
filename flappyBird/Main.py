@@ -22,13 +22,17 @@ last_pipe = None
 
 
 def main():
-    global CLOCK, SCREEN, bird, floor, point, last_pipe
+    global CLOCK, SCREEN, bird, floor, point, last_pipe, point_sound
     pygame.init()  # 初始化pygame
+    pygame.mixer.init()
+    point_sound = ResourceLoader.get_sound("point.wav")
+    wing_sound = ResourceLoader.get_sound("wing.wav")
+    die_sound = ResourceLoader.get_sound("die.wav")
     CLOCK = pygame.time.Clock()
     SCREEN = pygame.display.set_mode([SCREEN_WIDTH, SCREEN_HEIGHT])  # 初始化一个用于显示的窗口
     pygame.display.set_caption('flappyBird')  # 设置窗口标题.
 
-    bird = Bird(window_size)
+    bird = Bird(window_size, wing_sound, die_sound)
     floor = Floor(window_size)
     background = ResourceLoader.get_image("background-day.png")
     message = ResourceLoader.get_image("message.png")
@@ -41,22 +45,22 @@ def main():
                 sys.exit()
             if event.type == KEYDOWN:
                 if event.key == K_SPACE or event.key == K_UP:
-                    if not bird.die:
+                    if not bird.isDie:
                         bird.fly()
                     else:
                         reset()
-        if not bird.die:
+        if not bird.isDie:
             bird.update()
             floor.update()
         SCREEN.blit(background, (0, 0))
-        if not bird.begin_fly:
+        if not bird.begin_fly and not bird.isDie:
             SCREEN.blit(message, (message_rect.x, message_rect.y))
         else:
             for i in range(COUNT):
                 center_y = make_center_y()
                 pipe_top = pipes_top[i]
                 pipe_botom = pipes_botom[i]
-                if not bird.die:
+                if not bird.isDie:
                     pipe_top.update(center_y)
                     pipe_botom.update(center_y)
                 SCREEN.blit(pipe_top.image, (pipe_top.rect.x, pipe_top.rect.y))
@@ -64,27 +68,31 @@ def main():
 
         SCREEN.blit(floor.image, (floor.rect.x, floor.rect.y))
         SCREEN.blit(bird.get_bird_image(), (bird.rect.x, bird.rect.y))
-        if bird.die:
+        if bird.isDie:
             game_over = ResourceLoader.get_image("gameover.png")
             SCREEN.blit(game_over, (
                 (SCREEN_WIDTH - game_over.get_rect().width) / 2, (SCREEN_HEIGHT - game_over.get_rect().height) / 2))
-        if check_conlision():
-            bird.die = True
-        if not bird.die and bird.begin_fly:
-            arr = list(filter(lambda pipe:
-                              bird.rect.x > (pipe.rect.x + pipe.rect.width) > 0,
-                              pipes_botom))
-            if arr:
-                if last_pipe != arr[0]:
-                    point += 1
-                    last_pipe = arr[0]
         if bird.begin_fly:
-            showPoint()
+            show_point()
+            if check_conlision():
+                bird.die()
+
         pygame.display.flip()
         CLOCK.tick(FPS)
 
 
-def showPoint():
+def show_point():
+    global last_pipe, point
+    if not bird.isDie and bird.begin_fly:
+        arr = list(filter(lambda pipe:
+                          bird.rect.x > (pipe.rect.x + pipe.rect.width) > 0,
+                          pipes_botom))
+        if arr:
+            if last_pipe != arr[0]:
+                point += 1
+                last_pipe = arr[0]
+                point_sound.play()
+
     point_str = str(point)
     num_image_list = []
     for num in point_str:
