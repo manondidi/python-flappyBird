@@ -1,3 +1,4 @@
+#coding=utf-8
 import pygame  # 导入pygame库
 from pygame.locals import *  # 导入pygame库中的一些常量
 import sys
