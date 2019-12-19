@@ -1,11 +1,12 @@
-
- **1贪食蛇 snackGame**
-
-
-![](https://raw.githubusercontent.com/manondidi/python-games/master/snackGame/%E8%B4%AA%E9%A3%9F%E8%9B%87.png) 
+ **像素鸟 flappyBird**
 
 
- **2像素鸟 flappyBird**
+运行方法:  
+在python3环境下 安装 pygame,  
+然后运行Main.py文件  
+```
+pip install pygame
+python Main.py
+```
 
-
-![](https://raw.githubusercontent.com/manondidi/python-games/master/flappyBird/flappyBird.gif) 
+![](flappyBird.gif) 
