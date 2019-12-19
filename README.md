@@ -15,4 +15,8 @@ python Main.py
 
 
 ![](flappyBird.png) 
+
+
+  
+
 ![](flappyBird.gif) 
